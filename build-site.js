@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const INPUT_FOLDER = "content";
-const OUTPUT_FOLDER = "build";
+const OUTPUT_FOLDER = ".build";
 const TEMPLATE_FILE = "template.html";
 
 const template = fs.readFileSync(TEMPLATE_FILE, 'utf8');
