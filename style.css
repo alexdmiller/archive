@@ -1,0 +1,18 @@
+body {
+  background: #d9d4fa;
+  color: black;
+}
+
+.image {
+  height: 100vh;
+  width: auto;
+  object-fit: contain;
+  padding: 50px;
+  text-align: center;
+}
+
+img {
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;   /* Modern Browsers */
+}

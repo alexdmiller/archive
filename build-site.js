@@ -5,6 +5,8 @@ const path = require('path');
 const INPUT_FOLDER = "content";
 const OUTPUT_FOLDER = ".build";
 const TEMPLATE_FILE = "template.html";
+const CSS_FILE = "style.css";
+const IGNORE = ['index.md', 'index.html', '.DS_Store'];
 
 const template = fs.readFileSync(TEMPLATE_FILE, 'utf8');
 
@@ -27,7 +29,9 @@ async function renderDirectory(directoryPath) {
         await renderFile(`${directoryPath}/${file}`);
       }
     }
-  })
+  });
+
+  fs.copyFileSync(CSS_FILE, `${OUTPUT_FOLDER}/${CSS_FILE}`);
 }
 
 async function renderIndex(filePath, files) {
@@ -35,13 +39,20 @@ async function renderIndex(filePath, files) {
   const fileContents = fs.readFileSync(`${INPUT_FOLDER}/${filePath}`, 'utf8');
   let renderedFile = template.replace(/\{BODY\}/g, fileContents);
 
-  const imageFiles = files.filter(file => [".jpg", ".jpeg", ".png"].includes(path.extname(file)))
-  const otherFiles = files.filter(file => ![".jpg", ".jpeg", ".png"].includes(path.extname(file)))
+  const allImageFiles = files.filter(file => [".jpg", ".jpeg", ".png"].includes(path.extname(file)));
 
-  const imageList = renderGallery(imageFiles);
+  const specialImageFiles = allImageFiles.filter(file => file.includes("+special"));
+  const normalImageFiles = allImageFiles.filter(file => !file.includes("+special"));
+
+  const otherFiles = files
+    .filter(file => ![".jpg", ".jpeg", ".png"].includes(path.extname(file)))
+    .filter(file => !IGNORE.includes(path.basename(file)))
+
+  const specialImageList = renderGallery(specialImageFiles, "special");
+  const imageList = renderGallery(normalImageFiles);
   const fileList = otherFiles.map(file => `<li><a href="${file}">${file}</a></li>`).join("\n");
 
-  const allFiles = imageList + fileList;
+  const allFiles = specialImageList + imageList + fileList;
 
   renderedFile = renderedFile.replace(/\{FILES\}/g, allFiles);
 
@@ -65,10 +76,14 @@ async function renderFile(filePath) {
   }
 }
 
-function renderGallery(images) {
-  console.log(images);
-  const imageList = images.map(image => `<img src="${image}">`);
-  return imageList.join("\n");
+function renderGallery(images, className) {
+  className = className ?? "";
+  const imageList = images.map(image => `<div class='image ${className}' ><a href='${image}'><img src='${image}'></a></div>`);
+  return `
+    <div class='image-gallery ${className}'>
+      ${imageList.join("\n")}
+    </div>
+  `;
 }
 
 renderDirectory('');
