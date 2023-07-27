@@ -1,0 +1,4 @@
+- breadcrumbs
+- sitemap
+- better styles
+- video streaming

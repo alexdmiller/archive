@@ -54,7 +54,10 @@ async function renderIndex(filePath, files) {
 
   const allFiles = specialImageList + imageList + fileList;
 
+  const breadCrumb = renderBreadCrumbs(filePath, true);
+
   renderedFile = renderedFile.replace(/\{FILES\}/g, allFiles);
+  renderedFile = renderedFile.replace(/\{BREADCRUMB\}/g, breadCrumb);
 
   const extension = path.extname(filePath);
   const fileName = path.basename(filePath, extension);
@@ -68,7 +71,11 @@ async function renderFile(filePath) {
   const directory = path.dirname(filePath);
   if (extension === 'md' || extension === 'html') {
     const fileContents = fs.readFileSync(`${INPUT_FOLDER}/${filePath}`, 'utf8');
-    const renderedFile = template.replace(/\{BODY\}/g, fileContents);  
+    const breadCrumb = renderBreadCrumbs(filePath);
+
+    let renderedFile = template.replace(/\{BODY\}/g, fileContents);
+    renderedFile = renderedFile.replace(/\{BREADCRUMB\}/g, breadCrumb);
+
     const fileName = path.basename(filePath, extension);
     fs.writeFileSync(`${OUTPUT_FOLDER}/${directory}/${fileName}.html`, renderedFile);
   } else {
@@ -77,6 +84,10 @@ async function renderFile(filePath) {
 }
 
 function renderGallery(images, className) {
+  if (images.length === 0) {
+    return "";
+  }
+
   className = className ?? "";
   const imageList = images.map(image => `<div class='image ${className}' ><a href='${image}'><img src='${image}'></a></div>`);
   return `
@@ -84,6 +95,18 @@ function renderGallery(images, className) {
       ${imageList.join("\n")}
     </div>
   `;
+}
+
+function renderBreadCrumbs(filePath, skipLast=false) {
+  const parts = filePath.split("/");
+  let list = "";
+  const length = skipLast ? parts.length - 1 : parts.length;
+  list += `<li><a href="/">home</a></li>`;
+  for (let i = 1; i < length; i++) {
+    const url = parts.slice(0, i).join("/");
+    list += `<li><a href="${url}">${parts[i]}</a></li>`;
+  }
+  return `<ul>${list}</ul>`
 }
 
 renderDirectory('');

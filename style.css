@@ -1,6 +1,35 @@
-body {
-  background: #d9d4fa;
-  color: black;
+#header {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+h1, h2, #header li, #header ul {
+  display: inline;
+  font-size: 1em;
+  margin: 0;
+  padding: 0;
+
+  font-weight: normal;
+}
+
+#header li:not(:last-child)::after{
+  content: "/";
+  margin: 0 10px;
+}
+
+#header li:last-child {
+  font-weight: bold;
+}
+
+#header div {
+  display: block;
+}
+
+#divider {
+  width: 100%;
+  overflow: hidden;
 }
 
 .image {
